@@ -1,2 +1,2 @@
-qmpris
+QMpris
 ======
