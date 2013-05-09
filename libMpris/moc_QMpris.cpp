@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'QMpris.h'
 **
-** Created: Thu May 9 04:48:42 2013
+** Created: Thu May 9 05:30:20 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
 **
 ** WARNING! All changes made in this file will be lost!

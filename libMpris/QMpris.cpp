@@ -5,24 +5,32 @@ Widget::Widget() : QWidget(){
 
 }
 
+void helloWorldByLib(){
+    qDebug()<<"******** Hello World *********";
+}
+
 QStringList discoveredMprisPlayer(){
     QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusInterface dbus_iface("org.freedesktop.DBus", "/org/freedesktop/DBus",
                               "org.freedesktop.DBus", bus);
-    //    QVariantList list;
-    //    list.append( dbus_iface.call("ListNames").arguments().at(0));
     QVariant list=dbus_iface.call("ListNames").arguments().at(0);
-    QStringList mprisList;
     QRegExp rx("org.mpris.MediaPlayer2.*");
-    mprisList=list.toStringList().filter(rx);
-    qDebug() << mprisList << mprisList.count()<<mprisList.value(0);
-//    for(int i=0;i<mprisList.size();i++){
-//        QDBusInterface dbusIface(mprisList.value(i),"/org/mpris/mediaPlayer2",
-//                                 "org.mpris.MediaPlayer2",bus);
-//        qDebug()<<dbusIface.service();
-//        qDebug()<<dbusIface.property("Identity");
-    return (mprisList);
+    return(list.toStringList().filter(rx));
 }
-void helloWorldByLib(){
-    qDebug()<<"******** Hello World *********";
+
+void playPause(char* destination){
+    QDBusConnection bus= QDBusConnection::sessionBus();
+    QDBusMessage message= QDBusMessage::createMethodCall(destination,
+                                                         "/org/mpris/MediaPlayer2",
+                                                         "org.mpris.MediaPlayer2.Player","PlayPause");
+    QDBusConnection::sessionBus().send(message);
+}
+
+void simpleOperation(char* destination, char* op){
+    qDebug()<<"Call to "<<destination<<" for operation "<<op;
+    QDBusConnection bus= QDBusConnection::sessionBus();
+    QDBusMessage message= QDBusMessage::createMethodCall(destination,
+                                                         "/org/mpris/MediaPlayer2",
+                                                         "org.mpris.MediaPlayer2.Player",op);
+    QDBusConnection::sessionBus().send(message);
 }

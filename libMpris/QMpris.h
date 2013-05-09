@@ -16,6 +16,8 @@ public:
  Widget();
 }; 
 
-extern "C" QMPRIS_COMMON_DLLSPEC QStringList discoveredMprisPlayer();
 
 extern "C" QMPRIS_COMMON_DLLSPEC void helloWorldByLib();
+extern "C" QMPRIS_COMMON_DLLSPEC QStringList discoveredMprisPlayer();
+extern "C" QMPRIS_COMMON_DLLSPEC void playPause(char * destination);
+extern "C" QMPRIS_COMMON_DLLSPEC void simpleOperation(char* destination, char* op);
