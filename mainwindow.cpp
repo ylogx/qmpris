@@ -4,6 +4,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "QMpris.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), QDBusMessage(),
@@ -46,6 +47,20 @@ void MainWindow::reconnect(){
 
 void MainWindow::checkAvailablePlayer(){
     //Under Progress
+    QStringList mprisList = QMpris::discoveredMprisPlayer();
+    qDebug() << mprisList << mprisList.count()<<mprisList.value(0);
+    for(int i=0;i<mprisList.size();i++){
+        ui->comboBox->addItem(mprisList.value(i));  //TODO use identity
+//        QDBusInterface dbusIface(mprisList.value(i),"/org/mpris/mediaPlayer2",
+//                                 "org.mpris.MediaPlayer2",bus);
+//        qDebug()<<dbusIface.service();
+//        qDebug()<<dbusIface.property("Identity");
+//        OrgMprisMediaPlayer2Interface obj(mprisList.value(i),"/org/mpris/mediaPlayer2",
+//                                          QDBusConnection::sessionBus(),this);
+//        qDebug()<<obj.property("Identity");//.toStringList();
+//        ui->comboBox->addItem(playerName);
+    }
+/*
     QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusInterface dbus_iface("org.freedesktop.DBus", "/org/freedesktop/DBus",
                               "org.freedesktop.DBus", bus);
@@ -66,7 +81,9 @@ void MainWindow::checkAvailablePlayer(){
 //        qDebug()<<obj.property("Identity");//.toStringList();
 //        ui->comboBox->addItem(playerName);
     }
+*/
 // * * * Amarok * * *
+    QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusInterface *interface=new QDBusInterface("org.mpris.amarok",
                                                  "/org/mpris/MediaPlayer2",
                                                  "org.freedesktop.DBus.Introspectable",
@@ -148,20 +165,9 @@ void MainWindow::showKMix(){
 }
 
 void MainWindow::volumeChanged(int sliderVal){
-    QString service="org.mpris.MediaPlayer2.amarok";
-    //set dial
-    double sliderValDouble=sliderVal;
-    //qDebug()<<sliderVal<<"sliderval";
-    QDBusVariant var;
-    var.setVariant(QVariant::fromValue(sliderValDouble/100));
-    QDBusConnection bus=QDBusConnection::sessionBus();
-    QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
-    QDBusReply<QVariant> amarokVol = bus_interface.call("Set","org.mpris.MediaPlayer2.Player","Volume",QVariant::fromValue(var));
-
-    //qDebug()<<amarokVol.value().toDouble();
-    //ui->dial->setValue(100 * amarokVol.value().toDouble());
-    //ui->volumeSlider->setValue(100 * amarokVol.value().toDouble());
+    QMpris::setVolume("org.mpris.MediaPlayer2.amarok",sliderVal);
 }
+
 void MainWindow::positionChanged(int sliderVal){
     //set dial
     double sliderValDouble=sliderVal;
@@ -180,41 +186,32 @@ void MainWindow::positionChanged(int sliderVal){
 
 //---------------------Amarok-----------------------
 void MainWindow::pauseAmarok(){
-    //QDBusConnection bus = QDBusConnection::sessionBus();
+    QString destination="org.mpris.MediaPlayer2.amarok";
+    QMpris::playerOperation(destination,"PlayPause");
     //qtdbus org.kde.amarok /Player org.freedesktop.MediaPlayer.Pause
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.amarok",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player","PlayPause");
-    QDBusConnection::sessionBus().send(message);
 }
 void MainWindow::nextAmarok(){
-    char str[20]="Next";
+    QString str="Next";
     QString service="org.mpris.MediaPlayer2.amarok";
-    QDBusMessage message= QDBusMessage::createMethodCall(service,
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player",str);
-    //qDebug()<<str<<" mess: "<<message;
-    QDBusConnection::sessionBus().send(message);
-    setMetadata(service);
+//    QMpris::simpleOperation(service,str);
+    QMpris::playerOperation(service,str.toLocal8Bit().data());
+//    setMetadata(service);
 }
 void MainWindow::prevAmarok(){
     QString service="org.mpris.MediaPlayer2.amarok";
-    QDBusMessage message= QDBusMessage::createMethodCall(service,
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player","Previous");
-    QDBusConnection::sessionBus().send(message);
-    //qDebug()<<" mess: "<<message;
+    QMpris::playerOperation(service,"Previous");
     setMetadata(service);
 }
 void MainWindow::muteAmarok(){
     // XXX working
+//    QMpris::simpleOperation("org.mpris.MediaPlayer2.amarok","Mute");
     QDBusMessage getVolume= QDBusMessage::createMethodCall("org.mpris.amarok",
                                                          "/Player",
                                                          "org.freedesktop.MediaPlayer","Mute");
     QDBusMessage volumeAmarok=QDBusConnection::sessionBus().call(getVolume);
-    //bool queued=QDBusConnection::sessionBus().send(getVolume);
-    qDebug()<<"volume: "<<volumeAmarok;
-    //ui->checkBoxMute->set
+//    bool queued=QDBusConnection::sessionBus().send(getVolume);
+//    qDebug()<<"volume: "<<volumeAmarok;
+//    ui->checkBoxMute->set
 }
 void MainWindow::showAmarok(){
     QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.amarok",
@@ -225,27 +222,13 @@ void MainWindow::showAmarok(){
 
 //---------------------Clementine-----------------------
 void MainWindow::pauseClementine(){
-    //QDBusConnection bus = QDBusConnection::sessionBus();
-    //qtdbus org.kde.amarok /Player org.freedesktop.MediaPlayer.Pause
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.clementine",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player","PlayPause");
-    QDBusConnection::sessionBus().send(message);
+    QMpris::playerOperation("org.mpris.clementine","PlayPause");
 }
 void MainWindow::nextClementine(){
-    char str[20]="Next";
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.clementine",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player",str);
-    //qDebug()<<str<<" mess: "<<message;
-    QDBusConnection::sessionBus().send(message);
+    QMpris::playerOperation("org.mpris.clementine","Next");
 }
 void MainWindow::prevClementine(){
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.clementine",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player","Previous");
-    QDBusConnection::sessionBus().send(message);
-    //qDebug()<<" mess: "<<message;
+    QMpris::playerOperation("org.mpris.clementine","Previous");
 }
 void MainWindow::muteClementine(){
     QDBusMessage getVolume= QDBusMessage::createMethodCall("org.mpris.clementine",
@@ -264,13 +247,7 @@ void MainWindow::showClementine(){
 
 //--------------Audacious-----------------------------------
 void MainWindow::pauseAudacious(){
-    //QDBusConnection bus = QDBusConnection::sessionBus();
-    //qtdbus org.kde.amarok /Player org.freedesktop.MediaPlayer.Pause
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.MediaPlayer2.audacious",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2.Player","PlayPause");
-    QDBusConnection::sessionBus().send(message);
-    //qDebug()<<"pause mess:"<<message;
+    QMpris::playerOperation("org.mpris.MediaPlayer2.audacious","PlayPause");
 }
 void MainWindow::nextAudacious(){
     char str[20]="Next";
