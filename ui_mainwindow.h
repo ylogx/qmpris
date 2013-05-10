@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sat Apr 27 02:50:41 2013
+** Created: Thu May 9 22:11:35 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -66,7 +66,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(353, 445);
+        MainWindow->resize(346, 424);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         horizontalLayoutWidget = new QWidget(centralWidget);
@@ -190,8 +190,6 @@ public:
         horizontalLayout->addLayout(verticalLayout);
 
         MainWindow->setCentralWidget(centralWidget);
-        pushButtonPlay->raise();
-        horizontalLayoutWidget->raise();
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
         MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
@@ -200,7 +198,7 @@ public:
         MainWindow->setStatusBar(statusBar);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 353, 25));
+        menuBar->setGeometry(QRect(0, 0, 346, 21));
         MainWindow->setMenuBar(menuBar);
 
         retranslateUi(MainWindow);

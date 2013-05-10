@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>353</width>
-    <height>445</height>
+    <width>346</width>
+    <height>424</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -181,8 +181,6 @@
      </item>
     </layout>
    </widget>
-   <zorder>pushButtonPlay</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -198,8 +196,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>353</width>
-     <height>25</height>
+     <width>346</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
