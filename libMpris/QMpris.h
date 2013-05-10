@@ -1,3 +1,6 @@
+#ifndef QMPRIS_HEADER
+#define QMPRIS_HEADER
+
 #include <QtGui>
 #include <QtDBus/QtDBus>
 #include <QtDBus/QDBusMessage>
@@ -9,15 +12,17 @@
 #define QMPRIS_COMMON_DLLSPEC Q_DECL_IMPORT
 #endif
 
-class QMPRIS_COMMON_DLLSPEC Widget : public QWidget
-{
- Q_OBJECT
-public:
- Widget();
-}; 
-
+namespace QMpris{
+    void testDiscovered();
+    QStringList discoveredMprisPlayer();
+    void playPause(QString destination);
+    void playerOperation(QString destination, QString operation);
+    void setVolume(QString destination,int sliderVal);
+}
 
 extern "C" QMPRIS_COMMON_DLLSPEC void helloWorldByLib();
-extern "C" QMPRIS_COMMON_DLLSPEC QStringList discoveredMprisPlayer();
-extern "C" QMPRIS_COMMON_DLLSPEC void playPause(char * destination);
-extern "C" QMPRIS_COMMON_DLLSPEC void simpleOperation(char* destination, char* op);
+//extern "C" QMPRIS_COMMON_DLLSPEC QStringList discoveredMprisPlayer();
+//extern "C" QMPRIS_COMMON_DLLSPEC void playPause(char * destination);
+//extern "C" QMPRIS_COMMON_DLLSPEC void simpleOperation(char* destination, char* op);
+
+#endif //QMPRIS_HEADER
