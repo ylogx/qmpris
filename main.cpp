@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
     w.setWindowTitle(QObject::tr("Demo Sound Menu"));
     w.show();
 
-    QLibrary library("libQMpris.so");
+    //QLibrary library("liblibQMpris.so");
+    QLibrary library("libMpris/libqmpris.so");
     if (!library.load())
         qDebug() << library.errorString();
     if (library.load())
