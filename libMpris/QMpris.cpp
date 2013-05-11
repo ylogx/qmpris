@@ -29,6 +29,21 @@ void playerOperation(QString destination, QString operation){
     QDBusConnection::sessionBus().send(message);
 }
 
+double getPosition(QString service){
+    QDBusConnection bus=QDBusConnection::sessionBus();
+    QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
+    //get track length
+    QDBusReply<QVariant> metaVar = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Metadata");
+    QDBusArgument arg = metaVar.value().value<QDBusArgument>();
+    QVariantMap metaMap;
+    arg>>metaMap;
+    long int length = metaMap["mpris:length"].toInt();
+    //get position
+    QDBusReply<QVariant> amarokPos = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Position");
+
+    return(100*amarokPos.value().toDouble()/length);
+}
+
 void setVolume(QString destination,int sliderVal){
         //set dial
         double sliderValDouble=sliderVal;
@@ -42,6 +57,13 @@ void setVolume(QString destination,int sliderVal){
         qDebug()<<amarokVol.value().toDouble();
         //ui->dial->setValue(100 * amarokVol.value().toDouble());
         //ui->volumeSlider->setValue(100 * amarokVol.value().toDouble());
+}
+void raisePlayer(QString destination){
+    QDBusMessage message= QDBusMessage::createMethodCall(destination,
+                                                         "/org/mpris/MediaPlayer2",
+                                                         "org.mpris.MediaPlayer2","Raise");
+    QDBusConnection::sessionBus().send(message);
+//    qDebug()<<"raise mess: "<<message;
 }
 
 void playPause(QString destination){
