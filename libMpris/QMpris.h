@@ -17,7 +17,10 @@ namespace QMpris{
     QStringList discoveredMprisPlayer();
     void playPause(QString destination);
     void playerOperation(QString destination, QString operation);
+    QString getIdentity(QString service);
     void setVolume(QString destination,int sliderVal);
+    double getVolume(QString destination);
+    long getTrackLength(QString service);
     double getPosition(QString service);
     void raisePlayer(QString destination);
 }
