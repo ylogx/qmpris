@@ -31,6 +31,7 @@ protected:
 
 public slots:
     void reconnect();
+    void recheckMediaPlayers();
     void showKMix();
 
     void volumeChanged(int);
