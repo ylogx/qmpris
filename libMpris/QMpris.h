@@ -18,6 +18,8 @@ namespace QMpris{
     void playPause(QString destination);
     void playerOperation(QString destination, QString operation);
     void setVolume(QString destination,int sliderVal);
+    double getPosition(QString service);
+    void raisePlayer(QString destination);
 }
 
 extern "C" QMPRIS_COMMON_DLLSPEC void helloWorldByLib();
