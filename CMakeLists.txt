@@ -33,10 +33,10 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ADD_EXECUTABLE(loadQMpris ${loadQMpris_SOURCES} 
     ${loadQMpris_HEADERS_MOC}
     ${loadQMpris_FORMS_HEADERS} )
+INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR} )
 TARGET_LINK_LIBRARIES(loadQMpris ${QT_LIBRARIES})
 #TARGET_LINK_LIBRARIES(loadQMpris ${CMAKE_CURRENT_LIST_DIR}/libMpris/libQMpris.so)
 target_link_libraries(loadQMpris ${QT_QTDBUS_LIBRARY})
-
 #add my library
 include_directories("${CMAKE_CURRENT_LIST_DIR}/libMpris")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/libMpris")
