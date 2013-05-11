@@ -75,7 +75,7 @@ double getVolume(QString destination){
 void setVolume(QString destination,int sliderVal){
     //set dial
 //    qDebug()<<"Slider Value: "<<sliderVal;
-    if (sliderVal < 0.0)
+    if (sliderVal < 0.0)    //defensive
         sliderVal = 0.0;
     if (sliderVal > 100.0)
         sliderVal = 100.0;
