@@ -50,4 +50,4 @@ link_directories("${CMAKE_CURRENT_LIST_DIR}/libMpris")
 
 #target_link_libraries(loadQMpris ${CMAKE_CURRENT_BINARY_DIR}/liblibQMpris.so)#libQMpris)
 #target_link_libraries(loadQMpris ${CMAKE_CURRENT_BINARY_DIR}/libMpris/libqmpris.so)#libQMpris)
-target_link_libraries(loadQMpris qmpris)#libQMpris)
+target_link_libraries(loadQMpris qmpris)
