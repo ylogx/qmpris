@@ -19,11 +19,12 @@ FIND_PACKAGE(Qt4 REQUIRED)
 SET(QT_USE_QTDBUS TRUE)
 
 SET(qmpris_SOURCES QMpris.cpp)
-SET(qmpris_HEADERS QMpris.h)
-SET(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../build)
+SET(qmpris_HEADERS QMpris.h )# MediaPlayer2Player.h)
+#SET(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../build)
 #macro_ensure_out_of_source_build("Sound Menu Library requires an out of source build. Please create a separate build directory and run 'cmake path_to_src [options]' there.")
 #MACRO_ENSURE_OUT_OF_SOURCE_BUILD()
 
+INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR} )
 QT4_WRAP_CPP(qmpris_HEADERS_MOC ${qmpris_HEADERS})
 
 INCLUDE(${QT_USE_FILE})
