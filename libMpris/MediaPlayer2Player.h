@@ -16,6 +16,8 @@ namespace QMpris{
         ~MediaPlayer2Player();
     public:
         bool CanGoNext() const;
+
+        void Next() const;
 /*
         QString PlaybackStatus() const;
         QString LoopStatus() const;
