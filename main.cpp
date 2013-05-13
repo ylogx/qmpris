@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
     QStringList list = QMpris::discoveredMprisPlayer();
     qDebug()<<list;
     QMpris::testDiscovered();
-
+//    QMpris::MediaPlayer2Player player;
+//    player.CanGoNext();
 //    //QLibrary library("liblibQMpris.so");
 //    QLibrary library("libMpris/libqmpris.so");
 //    if (!library.load())

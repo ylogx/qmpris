@@ -6,6 +6,8 @@
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
  
+#include "MediaPlayer2Player.h"
+
 #if defined QMPRIS
 #define QMPRIS_COMMON_DLLSPEC  Q_DECL_EXPORT
 #else
