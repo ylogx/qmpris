@@ -12,9 +12,11 @@ namespace QMpris{
     private:
         //
     public:
-        explicit MediaPlayer2Player( QObject* parent );
+        explicit MediaPlayer2Player( QObject* parent = 0);
         ~MediaPlayer2Player();
     public:
+        bool CanGoNext() const;
+/*
         QString PlaybackStatus() const;
         QString LoopStatus() const;
         void setLoopStatus( const QString& loopStatus ) const;
@@ -51,9 +53,9 @@ namespace QMpris{
     
     private slots:
         void trackPositionChanged( qint64 position, bool userSeek );
-        void trackChanged( /* Meta:: TrackPtr track */);
-        void trackMetadataChanged( /* Meta::TrackPtr track */ );
-        void albumMetadataChanged( /* Meta::AlbumPtr album */ );
+        void trackChanged();    // Meta::AlbumPtr album );
+        void trackMetadataChanged();
+        void albumMetadataChanged();
         void seekableChanged( bool seekable );
         void volumeChanged( int newVolPercent );
         void trackLengthChanged( qint64 milliseconds );
@@ -66,9 +68,9 @@ namespace QMpris{
         void playlistActiveTrackChanged( quint64 );
 
     private:
-        QVariantMap metadataForTrack( /* Meta::TrackPtr track */ ) const;
+        QVariantMap metadataForTrack( );    //Meta::TrackPtr track ) const;
         qint64 m_lastPosition;
-
+*/
     };
 }
 
