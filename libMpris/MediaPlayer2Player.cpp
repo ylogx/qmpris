@@ -5,6 +5,7 @@
 namespace QMpris{
 
 MediaPlayer2Player::MediaPlayer2Player(QObject *parent)
+    :QObject(parent)
 {
 
 }

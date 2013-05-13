@@ -165,7 +165,7 @@ void MainWindow::volumeChanged(int sliderVal){
 
 void MainWindow::positionChanged(int sliderVal){
     //set dial
-    double sliderValDouble=sliderVal * 10;  //multiple of 1000
+    double sliderValDouble=sliderVal * 100;  //multiple of 1000
 //    //qDebug()<<sliderVal<<"sliderval";
 //    QDBusVariant var;
 //    var.setVariant(QVariant::fromValue(sliderValDouble/100));
@@ -173,10 +173,6 @@ void MainWindow::positionChanged(int sliderVal){
     QDBusInterface bus_interface("org.mpris.MediaPlayer2.amarok","/org/mpris/MediaPlayer2","org.mpris.MediaPlayer2.Player",bus);
     QDBusReply<QVariant> amarokVol = bus_interface.call("Seek",(qlonglong)sliderValDouble);
                                                         //"org.mpris.MediaPlayer2.Player","Volume",QVariant::fromValue(var));
-
-    //qDebug()<<amarokVol.value().toDouble();
-    //ui->dial->setValue(100 * amarokVol.value().toDouble());
-    //ui->volumeSlider->setValue(100 * amarokVol.value().toDouble());
 }
 
 //---------------------Amarok-----------------------
@@ -189,7 +185,6 @@ void MainWindow::pauseAmarok(){
 void MainWindow::nextAmarok(){
     QString str="Next";
     QString service="org.mpris.MediaPlayer2.amarok";
-//    QMpris::simpleOperation(service,str);
     QMpris::playerOperation(service,str.toLocal8Bit().data());
     setMetadata(service);
 }
