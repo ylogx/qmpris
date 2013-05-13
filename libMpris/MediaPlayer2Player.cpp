@@ -27,4 +27,16 @@ bool MediaPlayer2Player::CanGoNext() const{
     return(canGoNextVar.value().toBool());
 }
 
+void MediaPlayer2Player::Next() const{
+    //method void org.mpris.MediaPlayer2.Player.Next()
+    if(CanGoNext()){
+        QString service="org.mpris.MediaPlayer2.amarok";    //temp
+        QDBusMessage message= QDBusMessage::createMethodCall(service,
+                                                             "/org/mpris/MediaPlayer2",
+                                                             "org.mpris.MediaPlayer2.Player"
+                                                             ,"Next");
+        QDBusConnection::sessionBus().send(message);
+    }
+}
+
 }//end namespace QMpris
