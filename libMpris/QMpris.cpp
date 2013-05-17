@@ -107,6 +107,21 @@ void playPause(QString destination){
     QDBusConnection::sessionBus().send(message);
 }
 
+QString getArtUrl(QString service){
+    QDBusConnection bus=QDBusConnection::sessionBus();
+    QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
+    //get track length
+    QDBusReply<QVariant> metaVar = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Metadata");
+    QDBusArgument arg = metaVar.value().value<QDBusArgument>();
+    QVariantMap metaMap;
+    arg>>metaMap;
+//    qDebug()<<"Art URL is: "<<metaMap["mpris:artUrl"];
+    QString location;
+    location=metaMap["mpris:artUrl"].toString();
+    location.replace(0,7,"");
+    qDebug()<<"Art Location: "<<location;
+    return(location);
+}
 
 }//end namespace QMpris
 

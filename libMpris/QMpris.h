@@ -25,6 +25,7 @@ namespace QMpris{
     long getTrackLength(QString service);
     double getPosition(QString service);
     void raisePlayer(QString destination);
+    QString getArtUrl(QString service);
 }
 
 extern "C" QMPRIS_COMMON_DLLSPEC void helloWorldByLib();
