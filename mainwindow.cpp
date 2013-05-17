@@ -2,6 +2,9 @@
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
 
+#include <QGraphicsView>
+#include <QGraphicsScene>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "QMpris.h"
@@ -17,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButtonKMix, SIGNAL(clicked()),
             this, SLOT(showKMix()));
     //ui->dial->scroll(1,1);
-    checkAvailablePlayer();
+    listAvailablePlayers();
 //    connect(ui->comboBox, SIGNAL(activated(int)),// SIGNAL(currentIndexChanged(int)),
 //            this, SLOT(reconnect()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(int)),
@@ -47,50 +50,19 @@ void MainWindow::reconnect(){
     }
 }
 
-void MainWindow::checkAvailablePlayer(){
+void MainWindow::listAvailablePlayers(){
     //Under Progress
     ui->comboBox->clear();
     ui->comboBox->addItem("Select any player here");
+
     QStringList mprisList = QMpris::discoveredMprisPlayer();
+
     qDebug() << mprisList << mprisList.count()<<mprisList.value(0);
     for(int i=0;i<mprisList.size();i++){
         ui->comboBox->addItem(mprisList.value(i));  //TODO use identity
         if(ui->comboBox);
-//        QDBusInterface dbusIface(mprisList.value(i),"/org/mpris/mediaPlayer2",
-//                                 "org.mpris.MediaPlayer2",bus);
-//        qDebug()<<dbusIface.service();
-//        qDebug()<<dbusIface.property("Identity");
-//        OrgMprisMediaPlayer2Interface obj(mprisList.value(i),"/org/mpris/mediaPlayer2",
-//                                          QDBusConnection::sessionBus(),this);
-//        qDebug()<<obj.property("Identity");//.toStringList();
-//        ui->comboBox->addItem(playerName);
     }
-/*
-    for(int i=0;i<mprisList.size();i++){
-        QDBusInterface dbusIface(mprisList.value(i),"/org/mpris/mediaPlayer2",
-                                 "org.mpris.MediaPlayer2",bus);
-        ///qDebug()<<dbusIface.service();
-        //qDebug()<<dbusIface.property("Identity");
-//        OrgMprisMediaPlayer2Interface obj(mprisList.value(i),"/org/mpris/mediaPlayer2",
-//                                          QDBusConnection::sessionBus(),this);
-//        qDebug()<<obj.property("Identity");//.toStringList();
-//        ui->comboBox->addItem(playerName);
-    }
-// * * * Amarok * * *
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    QDBusInterface *interface=new QDBusInterface("org.mpris.amarok",
-                                                 "/org/mpris/MediaPlayer2",
-                                                 "org.freedesktop.DBus.Introspectable",
-                                                 bus);
-    QDBusReply<QString> amarokReply= interface->call("Introspect");
-    //qDebug()<<amarokReply;
-    if(amarokReply.value()!=""){
-        ui->comboBox->addItem("Amarok");
-        //qDebug()<<"here";
-        connectAmarok();    //by default
-    }
-
-*/
+    //TODO automatically connect one
 }//end checkAvailable
 
 void MainWindow::connectAmarok(){
@@ -100,6 +72,9 @@ void MainWindow::connectAmarok(){
     ui->volumeSlider->setValue( QMpris::getVolume(service) );
     setMetadata(service);
     setPositionSlider(service);
+    // album art
+
+    //connections
     connect(ui->pushButtonPlay, SIGNAL(clicked()),
             this, SLOT(pauseAmarok()));
     connect(ui->pushButtonNext, SIGNAL(clicked()),
@@ -146,9 +121,23 @@ void MainWindow::connectAudacious(){
 //****************************
 //***********SLOTS************
 //****************************
+void MainWindow::volumeChanged(int sliderVal){
+    QMpris::setVolume("org.mpris.MediaPlayer2.amarok",sliderVal);
+}
+
+void MainWindow::positionChanged(int sliderVal){
+    double sliderValDouble=sliderVal * 100;  //multiple of 1000
+//    //qDebug()<<sliderVal<<"sliderval";
+//    QDBusVariant var;
+//    var.setVariant(QVariant::fromValue(sliderValDouble/100));
+    QDBusConnection bus=QDBusConnection::sessionBus();
+    QDBusInterface bus_interface("org.mpris.MediaPlayer2.amarok","/org/mpris/MediaPlayer2","org.mpris.MediaPlayer2.Player",bus);
+    QDBusReply<QVariant> amarokVol = bus_interface.call("Seek",(qlonglong)sliderValDouble);
+                                                        //"org.mpris.MediaPlayer2.Player","Volume",QVariant::fromValue(var));
+}
 
 void MainWindow::recheckMediaPlayers(){
-    checkAvailablePlayer();
+    listAvailablePlayers();
 }
 
 void MainWindow::showKMix(){
@@ -159,21 +148,6 @@ void MainWindow::showKMix(){
     QDBusConnection::sessionBus().send(message);
 }
 
-void MainWindow::volumeChanged(int sliderVal){
-    QMpris::setVolume("org.mpris.MediaPlayer2.amarok",sliderVal);
-}
-
-void MainWindow::positionChanged(int sliderVal){
-    //set dial
-    double sliderValDouble=sliderVal * 100;  //multiple of 1000
-//    //qDebug()<<sliderVal<<"sliderval";
-//    QDBusVariant var;
-//    var.setVariant(QVariant::fromValue(sliderValDouble/100));
-    QDBusConnection bus=QDBusConnection::sessionBus();
-    QDBusInterface bus_interface("org.mpris.MediaPlayer2.amarok","/org/mpris/MediaPlayer2","org.mpris.MediaPlayer2.Player",bus);
-    QDBusReply<QVariant> amarokVol = bus_interface.call("Seek",(qlonglong)sliderValDouble);
-                                                        //"org.mpris.MediaPlayer2.Player","Volume",QVariant::fromValue(var));
-}
 
 //---------------------Amarok-----------------------
 void MainWindow::pauseAmarok(){
@@ -303,4 +277,27 @@ void MainWindow::setMetadata(QString service){
     ui->labelTitle->setText(title);
     ui->labelArtist->setText(artist);
     ui->labelAlbum->setText(album);
+    // Album Art
+    //    QGraphicsScene scene;
+    //    QGraphicsPixmapItem item(QPixmap(QMpris::getArtUrl(service)));
+    //    scene.addItem(&item);
+    //    ui->graphicsView->setScene(&scene);
+
+    //    QImage artImage;
+    //    artImage.load(QMpris::getArtUrl(service));
+    //    artImage.scaled(100,100);
+    //    ui->label->setPixmap(QPixmap::fromImage(artImage));
+
+    QPixmap pm(QMpris::getArtUrl(service));
+    setAutoFillBackground(true);
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(pm));
+//    pm.scaled ( 100, 100, Qt::KeepAspectRatio, Qt::FastTransformation );
+    ui->labelArt->setScaledContents(true);
+    ui->labelArt->setPixmap(pm);
+    //    ui->label->show();
+
+    //    QImage imageObject;
+    //    imageObject.load(QMpris::getArtUrl(service));
+    //    ui->label->setPixmap(QPixmap::fromImage(imageObject));
 }

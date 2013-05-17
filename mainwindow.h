@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow, QDBusMessage
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void checkAvailablePlayer();
+    void listAvailablePlayers();
     void setPositionSlider(QString);
     void setMetadata(QString);
 protected:

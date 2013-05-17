@@ -15,8 +15,6 @@ int main(int argc, char *argv[])
     w.setWindowTitle(QObject::tr("Demo Sound Menu"));
     w.show();
     //Testing
-//    QMpris::MediaPlayer2Player playerObj;
-//    playerObj.Next();
     return app.exec();
 }
 //QMPRIS::Player *QMPRIS::discoveredPlayers()
