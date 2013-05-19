@@ -126,12 +126,29 @@ QString getArtUrl(QString service){
     QDBusArgument arg = metaVar.value().value<QDBusArgument>();
     QVariantMap metaMap;
     arg>>metaMap;
-//    qDebug()<<"Art URL is: "<<metaMap["mpris:artUrl"];
+    qDebug()<<"Art URL is: "<<metaMap["mpris:artUrl"];
     QString location;
     location=metaMap["mpris:artUrl"].toString();
     location.replace(0,7,"");   // Strip "file://"
     qDebug()<<"Art Location: "<<location;
     return(location);
+}
+QStringList getMetadata(QString service){
+    QDBusConnection bus=QDBusConnection::sessionBus();
+    QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
+
+    QDBusReply<QVariant> metaVar = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Metadata");
+    QDBusArgument arg = metaVar.value().value<QDBusArgument>();
+    QVariantMap metaMap;
+    arg>>metaMap;
+    QStringList output;
+//    QString title  = metaMap["xesam:title"].toString();
+//    QString artist = metaMap["xesam:artist"].toString();
+//    QString album  = metaMap["xesam:album"].toString();
+    output << metaMap["xesam:title"].toString()
+           << metaMap["xesam:artist"].toString()
+           << metaMap["xesam:album"].toString();
+    return(output);
 }
 
 }//end namespace QMpris
