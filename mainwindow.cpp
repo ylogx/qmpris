@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 //            this, SLOT(reconnect()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(reconnect()));
-//    connect(ui->comboBox, SIGNAL(activated(int)),
-//            this, SLOT(recheckMediaPlayers()));
+    connect(ui->pushButtonRefresh, SIGNAL(clicked()),
+            this, SLOT(recheckMediaPlayers()));
 }//end constructor
 
 MainWindow::~MainWindow()
