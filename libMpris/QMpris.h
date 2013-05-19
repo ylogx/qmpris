@@ -24,6 +24,7 @@ namespace QMpris{
     double getVolume(QString destination);
     long getTrackLength(QString service);
     double getPosition(QString service);
+    void seek(QString, qlonglong);
     void raisePlayer(QString destination);
     QString getArtUrl(QString service);
 }

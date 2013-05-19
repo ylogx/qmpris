@@ -91,6 +91,17 @@ void setVolume(QString destination,int sliderVal){
     //ui->dial->setValue(100 * amarokVol.value().toDouble());
     //ui->volumeSlider->setValue(100 * amarokVol.value().toDouble());
 }
+
+void seek(QString destination, qlonglong offset){
+    QDBusConnection bus=QDBusConnection::sessionBus();
+    QDBusInterface bus_interface(destination,"/org/mpris/MediaPlayer2",
+                                 "org.mpris.MediaPlayer2.Player",bus);
+    QDBusReply<QVariant> amarokVol = bus_interface.call("Seek",(qlonglong)offset);
+                                                        //"org.mpris.MediaPlayer2.Player","Volume",QVariant::fromValue(var));
+    //    QDBusVariant var;
+    //    var.setVariant(QVariant::fromValue(sliderValDouble/100));
+}
+
 void raisePlayer(QString destination){
     QDBusMessage message= QDBusMessage::createMethodCall(destination,
                                                          "/org/mpris/MediaPlayer2",
