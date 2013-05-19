@@ -118,7 +118,7 @@ QString getArtUrl(QString service){
 //    qDebug()<<"Art URL is: "<<metaMap["mpris:artUrl"];
     QString location;
     location=metaMap["mpris:artUrl"].toString();
-    location.replace(0,7,"");
+    location.replace(0,7,"");   // Strip "file://"
     qDebug()<<"Art Location: "<<location;
     return(location);
 }

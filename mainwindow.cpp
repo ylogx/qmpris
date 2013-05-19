@@ -59,7 +59,7 @@ void MainWindow::listAvailablePlayers(){
 
     qDebug() << mprisList << mprisList.count()<<mprisList.value(0);
     for(int i=0;i<mprisList.size();i++){
-        ui->comboBox->addItem(mprisList.value(i));  //TODO use identity
+        ui->comboBox->addItem(QMpris::getIdentity(mprisList.value(i)));  //TODO use identity
         if(ui->comboBox);
     }
     //TODO automatically connect one
@@ -278,26 +278,31 @@ void MainWindow::setMetadata(QString service){
     ui->labelArtist->setText(artist);
     ui->labelAlbum->setText(album);
     // Album Art
-    //    QGraphicsScene scene;
-    //    QGraphicsPixmapItem item(QPixmap(QMpris::getArtUrl(service)));
-    //    scene.addItem(&item);
-    //    ui->graphicsView->setScene(&scene);
+    QString artUrl=QMpris::getArtUrl(service);
+    if(artUrl != ""){
+        //    QGraphicsScene scene;
+        //    QGraphicsPixmapItem item(QPixmap(QMpris::getArtUrl(service)));
+        //    scene.addItem(&item);
+        //    ui->graphicsView->setScene(&scene);
 
-    //    QImage artImage;
-    //    artImage.load(QMpris::getArtUrl(service));
-    //    artImage.scaled(100,100);
-    //    ui->label->setPixmap(QPixmap::fromImage(artImage));
+        //    QImage artImage;
+        //    artImage.load(QMpris::getArtUrl(service));
+        //    artImage.scaled(100,100);
+        //    ui->label->setPixmap(QPixmap::fromImage(artImage));
 
-    QPixmap pm(QMpris::getArtUrl(service));
-    setAutoFillBackground(true);
-    QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(pm));
-//    pm.scaled ( 100, 100, Qt::KeepAspectRatio, Qt::FastTransformation );
-    ui->labelArt->setScaledContents(true);
-    ui->labelArt->setPixmap(pm);
-    //    ui->label->show();
+        QPixmap pm(artUrl);
+        setAutoFillBackground(true);
+        QPalette palette;
+        palette.setBrush(QPalette::Window, QBrush(pm));
+        //    pm.scaled ( 100, 100, Qt::KeepAspectRatio, Qt::FastTransformation );
+        ui->labelArt->setScaledContents(true);
+        ui->labelArt->setPixmap(pm);
+        //    ui->label->show();
 
-    //    QImage imageObject;
-    //    imageObject.load(QMpris::getArtUrl(service));
-    //    ui->label->setPixmap(QPixmap::fromImage(imageObject));
+        //    QImage imageObject;
+        //    imageObject.load(QMpris::getArtUrl(service));
+        //    ui->label->setPixmap(QPixmap::fromImage(imageObject));
+    }else{
+        ui->labelArt->setText("No Art");
+    }
 }
