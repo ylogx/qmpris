@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>359</width>
-    <height>417</height>
+    <width>339</width>
+    <height>421</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,9 +27,6 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QComboBox" name="comboBox"/>
-       </item>
-       <item>
         <widget class="QLabel" name="labelPlayer">
          <property name="text">
           <string>Current Player</string>
@@ -38,6 +35,26 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QComboBox" name="comboBox"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonRefresh">
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>&amp;Refresh</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonShow">
@@ -248,7 +265,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>359</width>
+     <width>339</width>
      <height>21</height>
     </rect>
    </property>
