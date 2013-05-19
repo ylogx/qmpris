@@ -130,14 +130,9 @@ void MainWindow::volumeChanged(int sliderVal){
 void MainWindow::positionChanged(int sliderVal){
     double sliderValDouble=sliderVal * 1000 * 10;  //multiple of 1000
 //    //qDebug()<<sliderVal<<"sliderval";
-//    QDBusVariant var;
-//    var.setVariant(QVariant::fromValue(sliderValDouble/100));
+    //TODO make it work according to tracklength
     QString destination("org.mpris.MediaPlayer2.amarok");
     QMpris::seek(destination,sliderValDouble);
-//    QDBusConnection bus=QDBusConnection::sessionBus();
-//    QDBusInterface bus_interface("org.mpris.MediaPlayer2.amarok","/org/mpris/MediaPlayer2","org.mpris.MediaPlayer2.Player",bus);
-//    QDBusReply<QVariant> amarokVol = bus_interface.call("Seek",(qlonglong)sliderValDouble);
-//                                                        //"org.mpris.MediaPlayer2.Player","Volume",QVariant::fromValue(var));
 }
 
 void MainWindow::recheckMediaPlayers(){
