@@ -92,23 +92,13 @@ void MainWindow::connectAmarok(){
     connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
             this, SLOT(positionChanged(int)));
 }
-void MainWindow::connectClementine(){
-    QString service="org.mpris.MediaPlayer2.clementine";
-    ui->labelPlayer->setText(QMpris::getIdentity(service));
-    connect(ui->pushButtonPlay, SIGNAL(clicked()),
-            this, SLOT(pauseClementine()));
-    connect(ui->pushButtonNext, SIGNAL(clicked()),
-            this, SLOT(nextClementine()));
-    connect(ui->pushButtonPrev, SIGNAL(clicked()),
-            this, SLOT(prevClementine()));
-    connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
-            this, SLOT(muteClementine()));
-    connect(ui->pushButtonShow, SIGNAL(clicked()),
-            this, SLOT(showClementine()));
-}
 void MainWindow::connectAudacious(){
     QString service="org.mpris.MediaPlayer2.audacious";
     ui->labelPlayer->setText(QMpris::getIdentity(service));
+    //***set current volume
+    ui->volumeSlider->setValue( QMpris::getVolume(service) );
+    setMetadata(service);
+    setPositionSlider(service);
     connect(ui->pushButtonPlay, SIGNAL(clicked()),
             this, SLOT(pauseAudacious()));
     connect(ui->pushButtonNext, SIGNAL(clicked()),
@@ -119,20 +109,68 @@ void MainWindow::connectAudacious(){
             this, SLOT(muteAudacious(muteState)));
     connect(ui->pushButtonShow, SIGNAL(clicked()),
             this, SLOT(showAudacious()));
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+            this, SLOT(volumeChanged(int)));
+    connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
+            this, SLOT(positionChanged(int)));
 }
+void MainWindow::connectClementine(){
+    QString service="org.mpris.MediaPlayer2.clementine";
+    ui->labelPlayer->setText(QMpris::getIdentity(service));
+    //***set current volume
+    ui->volumeSlider->setValue( QMpris::getVolume(service) );
+    setMetadata(service);
+    setPositionSlider(service);
+    connect(ui->pushButtonPlay, SIGNAL(clicked()),
+            this, SLOT(pauseClementine()));
+    connect(ui->pushButtonNext, SIGNAL(clicked()),
+            this, SLOT(nextClementine()));
+    connect(ui->pushButtonPrev, SIGNAL(clicked()),
+            this, SLOT(prevClementine()));
+    connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
+            this, SLOT(muteClementine()));
+    connect(ui->pushButtonShow, SIGNAL(clicked()),
+            this, SLOT(showClementine()));
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+            this, SLOT(volumeChanged(int)));
+    connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
+            this, SLOT(positionChanged(int)));
+}
+
 //****************************
 //***********SLOTS************
 //****************************
 void MainWindow::volumeChanged(int sliderVal){
-    QMpris::setVolume("org.mpris.MediaPlayer2.amarok",sliderVal);
+    switch(ui->labelPlayer->text().length()){
+    case 7://"Amarok":
+        QMpris::setVolume("org.mpris.MediaPlayer2.amarok",sliderVal);
+        break;
+    case 9://"Audacious":
+        QMpris::setVolume("org.mpris.MediaPlayer2.audacious",sliderVal);
+        break;
+    case 10://"Clementine":
+        QMpris::setVolume("org.mpris.MediaPlayer2.audacious",sliderVal);
+        break;
+    default: break;
+    }
 }
 
 void MainWindow::positionChanged(int sliderVal){
     double sliderValDouble=sliderVal * 1000 * 10;  //multiple of 1000
 //    //qDebug()<<sliderVal<<"sliderval";
     //TODO make it work according to tracklength
-    QString destination("org.mpris.MediaPlayer2.amarok");
-    QMpris::seek(destination,sliderValDouble);
+    switch(ui->labelPlayer->text().length()){
+    case 7://"Amarok":
+        QMpris::seek("org.mpris.MediaPlayer2.amarok",sliderValDouble);
+        break;
+    case 9://"Audacious":
+        QMpris::seek("org.mpris.MediaPlayer2.audacious",sliderValDouble);
+        break;
+    case 10://"Clementine":
+        QMpris::seek("org.mpris.MediaPlayer2.audacious",sliderValDouble);
+        break;
+    default: break;
+    }
 }
 
 void MainWindow::recheckMediaPlayers(){
@@ -186,13 +224,19 @@ void MainWindow::showAmarok(){
 
 //---------------------Clementine-----------------------
 void MainWindow::pauseClementine(){
-    QMpris::playerOperation("org.mpris.clementine","PlayPause");
+    QString service="org.mpris.MediaPlayer2.clementine";
+    QMpris::playerOperation(service,"PlayPause");
+    setMetadata(service);
 }
 void MainWindow::nextClementine(){
-    QMpris::playerOperation("org.mpris.clementine","Next");
+    QString service="org.mpris.MediaPlayer2.clementine";
+    QMpris::playerOperation(service,"Next");
+    setMetadata(service);
 }
 void MainWindow::prevClementine(){
-    QMpris::playerOperation("org.mpris.clementine","Previous");
+    QString service="org.mpris.MediaPlayer2.clementine";
+    QMpris::playerOperation(service,"Previous");
+    setMetadata(service);
 }
 void MainWindow::muteClementine(){
     QDBusMessage getVolume= QDBusMessage::createMethodCall("org.mpris.clementine",
@@ -211,13 +255,24 @@ void MainWindow::showClementine(){
 
 //--------------Audacious-----------------------------------
 void MainWindow::pauseAudacious(){
-    QMpris::playerOperation("org.mpris.MediaPlayer2.audacious","PlayPause");
+    QString service="org.mpris.MediaPlayer2.audacious";
+    QMpris::playerOperation(service,"PlayPause");
+    setMetadata(service);
 }
 void MainWindow::nextAudacious(){
-    QMpris::playerOperation("org.mpris.MediaPlayer2.audacious","Next");
+    QString str="Next";
+    QString service="org.mpris.MediaPlayer2.audacious";
+    QMpris::playerOperation(service,str);
+    setMetadata(service);
 }
 void MainWindow::prevAudacious(){
-    QMpris::playerOperation("org.mpris.MediaPlayer2.audacious","Previous");
+    QString service="org.mpris.MediaPlayer2.audacious";
+    QMpris::playerOperation(service,"Previous");
+    setMetadata(service);
+}
+void MainWindow::showAudacious(){
+    //ui->pushButtonShow->setText("Can't Raise");
+    QMpris::raisePlayer("org.mpris.MediaPlayer2.audacious");
 }
 void MainWindow::muteAudacious(bool muteState){
     // XXX working
@@ -235,50 +290,30 @@ void MainWindow::muteAudacious(bool muteState){
     //qDebug()<<"volume: "<<volumeAmarok;
     //ui->checkBoxMute->set
 }
-void MainWindow::showAudacious(){
-    //ui->pushButtonShow->setText("Can't Raise");
-    QMpris::raisePlayer("org.mpris.MediaPlayer2.audacious");
-    //    QDBusMessage m= QDBusMessage::createMethodCall("org.mpris.amarok",
-    //                                                   "/org/mpris/MediaPlayer2",
-    //                                                   "org.mpris.MediaPlayer2.Player","SetPosition");
-    //    QList<QVariant> args;     // QList of QVariant objects
-    //    args.append(7);
-    //    args.append(30);
-    //    m.setArguments(args);     //can also use overloaded << directly
-    //    bool queued=QDBusConnection::sessionBus().send(m);
-    //    qDebug()<<queued<<" mess: "<<m;
-    //    QDBusMessage m= QDBusMessage::createMethodCall("org.mpris.amarok",
-    //                                                   "/Tracklist",
-    //                                                   "org.freedesktop.MediaPlayer","GetLength");//"GetCurrentTrack");
-    //    QDBusReply<int> response=QDBusConnection::sessionBus().call(m);
-    //    qDebug()<<" mess: "<<response;
-    //    QList<QVariant> list=response.arguments(); //QDBusMessage::arguments();
-    //    qDebug()<<"0: "<<list[0].toInt();
-}
 
 //******Other functions
 void MainWindow::setPositionSlider(QString service){
     ui->positionSlider->setValue( QMpris::getPosition(service) );
 }
 void MainWindow::setMetadata(QString service){
-    QDBusConnection bus=QDBusConnection::sessionBus();
-    QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
-
-    QDBusReply<QVariant> metaVar = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Metadata");
-    QDBusArgument arg = metaVar.value().value<QDBusArgument>();
-    QVariantMap metaMap;
-    arg>>metaMap;
-    QString title  = metaMap["xesam:title"].toString();
-    QString artist = metaMap["xesam:artist"].toString();
-    QString album  = metaMap["xesam:album"].toString();
-    qDebug()<<title<<album<<artist;
-    //set here
-    ui->labelTitle->setText(title);
-    ui->labelArtist->setText(artist);
-    ui->labelAlbum->setText(album);
-    // Album Art
+    QStringList strList(QMpris::getMetadata(service));
+    ui->labelTitle->setText(strList.at(0));
+    ui->labelArtist->setText(strList.at(1));
+    ui->labelAlbum->setText(strList.at(2));
+//    ui->labelTitle->setText(title);
+//    ui->labelArtist->setText(artist);
+//    ui->labelAlbum->setText(album);
+    // --- Album Art ---
     QString artUrl=QMpris::getArtUrl(service);
     if(artUrl != ""){
+        QPixmap pm(artUrl);
+        setAutoFillBackground(true);
+        QPalette palette;
+        palette.setBrush(QPalette::Window, QBrush(pm));
+        //    pm.scaled ( 100, 100, Qt::KeepAspectRatio, Qt::FastTransformation );
+        ui->labelArt->setScaledContents(true);
+        ui->labelArt->setPixmap(pm);
+
         //    QGraphicsScene scene;
         //    QGraphicsPixmapItem item(QPixmap(QMpris::getArtUrl(service)));
         //    scene.addItem(&item);
@@ -289,14 +324,6 @@ void MainWindow::setMetadata(QString service){
         //    artImage.scaled(100,100);
         //    ui->label->setPixmap(QPixmap::fromImage(artImage));
 
-        QPixmap pm(artUrl);
-        setAutoFillBackground(true);
-        QPalette palette;
-        palette.setBrush(QPalette::Window, QBrush(pm));
-        //    pm.scaled ( 100, 100, Qt::KeepAspectRatio, Qt::FastTransformation );
-        ui->labelArt->setScaledContents(true);
-        ui->labelArt->setPixmap(pm);
-        //    ui->label->show();
 
         //    QImage imageObject;
         //    imageObject.load(QMpris::getArtUrl(service));
