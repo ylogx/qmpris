@@ -142,7 +142,7 @@ void MainWindow::connectClementine(){
 //****************************
 void MainWindow::volumeChanged(int sliderVal){
     switch(ui->labelPlayer->text().length()){
-    case 7://"Amarok":
+    case 6://"Amarok":
         QMpris::setVolume("org.mpris.MediaPlayer2.amarok",sliderVal);
         break;
     case 9://"Audacious":
@@ -160,7 +160,7 @@ void MainWindow::positionChanged(int sliderVal){
 //    //qDebug()<<sliderVal<<"sliderval";
     //TODO make it work according to tracklength
     switch(ui->labelPlayer->text().length()){
-    case 7://"Amarok":
+    case 6://"Amarok":
         QMpris::seek("org.mpris.MediaPlayer2.amarok",sliderValDouble);
         break;
     case 9://"Audacious":
@@ -331,4 +331,16 @@ void MainWindow::setMetadata(QString service){
     }else{
         ui->labelArt->setText("No Art");
     }
+    //track time
+    long length=QMpris::getTrackLength(service);
+    long milliseconds   = (long) (length / 1000) % 1000;
+    long seconds    = (((long) (length / 1000) - milliseconds)/1000)%60 ;
+    long minutes    = (((((long) (length / 1000) - milliseconds)/1000) - seconds)/60) %60 ;
+    long hours      = ((((((long) (length / 1000) - milliseconds)/1000) - seconds)/60) - minutes)/60;
+    QString formatStr;
+    formatStr.append(QString("%1").arg(minutes));
+    formatStr.append(":");
+    formatStr.append(QString("%1").arg(seconds));
+    ui->labelLength->setText(formatStr);
+    //qDebug()<<"hr:"<<hours<<"min: "<<minutes<<"sec"<<seconds<<"mil"<<milliseconds;
 }
