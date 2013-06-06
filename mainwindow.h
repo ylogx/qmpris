@@ -25,35 +25,26 @@ public:
     void setMetadata(QString);
 protected:
     Ui::MainWindow *ui;
-    void connectAmarok();
-    void connectClementine();
-    void connectAudacious();
+    QString currentPlayer();
+    void basicConnections();
 
 public slots:
     void reconnect();
     void recheckMediaPlayers();
     void showKMix();
 
+    void pause();
+    void next();
+    void prev();
+    void showPlayer();
     void volumeChanged(int);
     void positionChanged(int);
-    void pauseAmarok();
-    void nextAmarok();
-    void prevAmarok();
+
     void muteAmarok();
-    void showAmarok();
 
-
-    void pauseAudacious();
-    void nextAudacious();
-    void prevAudacious();
     void muteAudacious(bool);
-    void showAudacious();
 
-    void pauseClementine();
-    void nextClementine();
-    void prevClementine();
     void muteClementine();
-    void showClementine();
 };
 
 #endif // MAINWINDOW_H
