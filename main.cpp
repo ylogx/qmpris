@@ -14,6 +14,9 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.setWindowTitle(QObject::tr("Demo Sound Menu"));
     w.show();
+
+//    connect(ui->actionQuit, SIGNAL(triggered()),
+//            this, app.exec());
     //Testing
     return app.exec();
 }

@@ -34,22 +34,6 @@ MainWindow::~MainWindow()
     delete ui;
 }//end destructor
 
-void MainWindow::reconnect(){
-    ui->pushButtonPlay->disconnect();
-    ui->pushButtonNext->disconnect();
-    ui->pushButtonPrev->disconnect();
-    ui->pushButtonShow->disconnect();
-    ui->checkBoxMute->disconnect();
-
-    if(ui->comboBox->currentText()=="Amarok" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.amarok"){
-        connectAmarok();
-    }else if(ui->comboBox->currentText()=="Clementine" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.clementine"){
-        connectClementine();
-    }else if(ui->comboBox->currentText()=="Audacious" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.audacious"){
-        connectAudacious();
-    }
-}
-
 void MainWindow::listAvailablePlayers(){
     //Under Progress
     ui->comboBox->clear();
@@ -59,82 +43,82 @@ void MainWindow::listAvailablePlayers(){
 
     qDebug() << mprisList << mprisList.count()<<mprisList.value(0);
     for(int i=0;i<mprisList.size();i++){
-        ui->comboBox->addItem(QMpris::getIdentity(mprisList.value(i)));  //TODO use identity
+        ui->comboBox->addItem(QMpris::getIdentity(mprisList.value(i)));
         if(ui->comboBox);
     }
     //TODO automatically connect one
 }//end checkAvailable
 
-void MainWindow::connectAmarok(){
-    QString service="org.mpris.MediaPlayer2.amarok";
-    ui->labelPlayer->setText(QMpris::getIdentity(service));
-    //***set current volume
-    ui->volumeSlider->setValue( QMpris::getVolume(service) );
-    setMetadata(service);
-    setPositionSlider(service);
-    // album art
+QString MainWindow::currentPlayer(){
+    if(ui->comboBox->currentText()=="Amarok" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.amarok"){
+        return ("org.mpris.MediaPlayer2.amarok");
+    }else if(ui->comboBox->currentText()=="Clementine" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.clementine"){
+        return ("org.mpris.MediaPlayer2.clementine");
+    }else if(ui->comboBox->currentText()=="Audacious" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.audacious"){
+        return ("org.mpris.MediaPlayer2.audacious");
+    }else if(ui->comboBox->currentText()=="Rhythmbox" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.rhythmbox"){
+        return ("org.mpris.MediaPlayer2.rhythmbox");
+    }
+}
 
+void MainWindow::reconnect(){
+    ui->pushButtonPlay->disconnect();
+    ui->pushButtonNext->disconnect();
+    ui->pushButtonPrev->disconnect();
+    ui->pushButtonShow->disconnect();
+    ui->checkBoxMute->disconnect();
+
+    QString service = currentPlayer();
+
+    ui->labelPlayer->setText(QMpris::getIdentity(service));
+    //***set current volume
+    ui->volumeSlider->setValue( QMpris::getVolume(service) );
+    setMetadata(service);
+    setPositionSlider(service);
     //connections
-    connect(ui->pushButtonPlay, SIGNAL(clicked()),
-            this, SLOT(pauseAmarok()));
-    connect(ui->pushButtonNext, SIGNAL(clicked()),
-            this, SLOT(nextAmarok()));
-    connect(ui->pushButtonPrev, SIGNAL(clicked()),
-            this, SLOT(prevAmarok()));
-    connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
-            this, SLOT(muteAmarok()));
-    connect(ui->pushButtonShow, SIGNAL(clicked()),
-            this, SLOT(showAmarok()));
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(volumeChanged(int)));
-//    connect(ui->positionSlider, SIGNAL(valueChanged(int)),
-//            this, SLOT(positionChanged(int)));
-    connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
-            this, SLOT(positionChanged(int)));
+    basicConnections();
+    //specific connections
+    if(service=="org.mpris.MediaPlayer2.amarok"){
+        connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
+                this, SLOT(muteAmarok()));
+        connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+                this, SLOT(volumeChanged(int)));
+    //    connect(ui->positionSlider, SIGNAL(valueChanged(int)),
+    //            this, SLOT(positionChanged(int)));
+        connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
+                this, SLOT(positionChanged(int)));
+    }else if(service=="org.mpris.MediaPlayer2.clementine"){
+        connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
+                this, SLOT(muteClementine()));
+        connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+                this, SLOT(volumeChanged(int)));
+        connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
+                this, SLOT(positionChanged(int)));
+    }else if(service=="org.mpris.MediaPlayer2.audacious"){
+        connect(ui->checkBoxMute, SIGNAL(toggled(bool muteState)),
+                this, SLOT(muteAudacious(muteState)));
+        connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+                this, SLOT(volumeChanged(int)));
+        connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
+                this, SLOT(positionChanged(int)));
+    }else if(service=="org.mpris.MediaPlayer2.rhythmbox"){
+        connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+                this, SLOT(volumeChanged(int)));
+        connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
+                this, SLOT(positionChanged(int)));
+    }//else do nothing, make no connections
+
 }
-void MainWindow::connectAudacious(){
-    QString service="org.mpris.MediaPlayer2.audacious";
-    ui->labelPlayer->setText(QMpris::getIdentity(service));
-    //***set current volume
-    ui->volumeSlider->setValue( QMpris::getVolume(service) );
-    setMetadata(service);
-    setPositionSlider(service);
+
+void MainWindow::basicConnections(){
     connect(ui->pushButtonPlay, SIGNAL(clicked()),
-            this, SLOT(pauseAudacious()));
+            this, SLOT(pause()));
     connect(ui->pushButtonNext, SIGNAL(clicked()),
-            this, SLOT(nextAudacious()));
+            this, SLOT(next()));
     connect(ui->pushButtonPrev, SIGNAL(clicked()),
-            this, SLOT(prevAudacious()));
-    connect(ui->checkBoxMute, SIGNAL(toggled(bool muteState)),
-            this, SLOT(muteAudacious(muteState)));
+            this, SLOT(prev()));
     connect(ui->pushButtonShow, SIGNAL(clicked()),
-            this, SLOT(showAudacious()));
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(volumeChanged(int)));
-    connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
-            this, SLOT(positionChanged(int)));
-}
-void MainWindow::connectClementine(){
-    QString service="org.mpris.MediaPlayer2.clementine";
-    ui->labelPlayer->setText(QMpris::getIdentity(service));
-    //***set current volume
-    ui->volumeSlider->setValue( QMpris::getVolume(service) );
-    setMetadata(service);
-    setPositionSlider(service);
-    connect(ui->pushButtonPlay, SIGNAL(clicked()),
-            this, SLOT(pauseClementine()));
-    connect(ui->pushButtonNext, SIGNAL(clicked()),
-            this, SLOT(nextClementine()));
-    connect(ui->pushButtonPrev, SIGNAL(clicked()),
-            this, SLOT(prevClementine()));
-    connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
-            this, SLOT(muteClementine()));
-    connect(ui->pushButtonShow, SIGNAL(clicked()),
-            this, SLOT(showClementine()));
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(volumeChanged(int)));
-    connect(ui->positionSlider, SIGNAL(sliderMoved(int)),
-            this, SLOT(positionChanged(int)));
+            this, SLOT(showPlayer()));
 }
 
 //****************************
@@ -185,25 +169,33 @@ void MainWindow::showKMix(){
     QDBusConnection::sessionBus().send(message);
 }
 
-
-//---------------------Amarok-----------------------
-void MainWindow::pauseAmarok(){
-    QString destination="org.mpris.MediaPlayer2.amarok";
-    QMpris::playerOperation(destination,"PlayPause");
-    //qtdbus org.kde.amarok /Player org.freedesktop.MediaPlayer.Pause
-    setMetadata(destination);
-}
-void MainWindow::nextAmarok(){
-    QString str="Next";
-    QString service="org.mpris.MediaPlayer2.amarok";
-    QMpris::playerOperation(service,str.toLocal8Bit().data());
+void MainWindow::pause(){
+    QString service = currentPlayer();
+    QMpris::playerOperation(service,"PlayPause");
     setMetadata(service);
 }
-void MainWindow::prevAmarok(){
-    QString service="org.mpris.MediaPlayer2.amarok";
+void MainWindow::next(){
+    QString service = currentPlayer();
+    QMpris::playerOperation(service,"Next");
+    setMetadata(service);
+}
+void MainWindow::prev(){
+    QString service = currentPlayer();
     QMpris::playerOperation(service,"Previous");
     setMetadata(service);
 }
+
+void MainWindow::showPlayer(){
+    QString service = currentPlayer();
+    QDBusMessage message= QDBusMessage::createMethodCall(service,
+                                                         "/org/mpris/MediaPlayer2",
+                                                         "org.mpris.MediaPlayer2","Raise");
+    QDBusConnection::sessionBus().send(message);
+}
+
+
+//---------------------Amarok-----------------------
+
 void MainWindow::muteAmarok(){
     // XXX working
 //    QMpris::simpleOperation("org.mpris.MediaPlayer2.amarok","Mute");
@@ -215,65 +207,18 @@ void MainWindow::muteAmarok(){
 //    qDebug()<<"volume: "<<volumeAmarok;
 //    ui->checkBoxMute->set
 }
-void MainWindow::showAmarok(){
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.amarok",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2","Raise");
-    QDBusConnection::sessionBus().send(message);
-}
 
 //---------------------Clementine-----------------------
-void MainWindow::pauseClementine(){
-    QString service="org.mpris.MediaPlayer2.clementine";
-    QMpris::playerOperation(service,"PlayPause");
-    setMetadata(service);
-}
-void MainWindow::nextClementine(){
-    QString service="org.mpris.MediaPlayer2.clementine";
-    QMpris::playerOperation(service,"Next");
-    setMetadata(service);
-}
-void MainWindow::prevClementine(){
-    QString service="org.mpris.MediaPlayer2.clementine";
-    QMpris::playerOperation(service,"Previous");
-    setMetadata(service);
-}
 void MainWindow::muteClementine(){
     QDBusMessage getVolume= QDBusMessage::createMethodCall("org.mpris.clementine",
                                                          "/Player",
                                                          "org.freedesktop.MediaPlayer","Mute");
     QDBusConnection::sessionBus().send(getVolume);
 }
-void MainWindow::showClementine(){
-    // xxx not supported
-    QDBusMessage message= QDBusMessage::createMethodCall("org.mpris.clementine",
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2","Raise");
-    QDBusConnection::sessionBus().send(message);
-}
 
+//---------------------Rhythmbox-----------------------
 
 //--------------Audacious-----------------------------------
-void MainWindow::pauseAudacious(){
-    QString service="org.mpris.MediaPlayer2.audacious";
-    QMpris::playerOperation(service,"PlayPause");
-    setMetadata(service);
-}
-void MainWindow::nextAudacious(){
-    QString str="Next";
-    QString service="org.mpris.MediaPlayer2.audacious";
-    QMpris::playerOperation(service,str);
-    setMetadata(service);
-}
-void MainWindow::prevAudacious(){
-    QString service="org.mpris.MediaPlayer2.audacious";
-    QMpris::playerOperation(service,"Previous");
-    setMetadata(service);
-}
-void MainWindow::showAudacious(){
-    //ui->pushButtonShow->setText("Can't Raise");
-    QMpris::raisePlayer("org.mpris.MediaPlayer2.audacious");
-}
 void MainWindow::muteAudacious(bool muteState){
     // XXX working
     QDBusMessage getVolume= QDBusMessage::createMethodCall("org.mpris.audacious",
