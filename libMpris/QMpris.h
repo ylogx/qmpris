@@ -5,7 +5,7 @@
 #include <QtDBus/QtDBus>
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
- 
+
 #include "MediaPlayer2Player.h"
 
 #if defined QMPRIS
@@ -16,16 +16,23 @@
 
 namespace QMpris{
     void testDiscovered();
+
     QStringList discoveredMprisPlayer();
+
     void playPause(QString destination);
     void playerOperation(QString destination, QString operation);
+
     QString getIdentity(QString service);
+
     void setVolume(QString destination,int sliderVal);
     double getVolume(QString destination);
+
     long getTrackLength(QString service);
     double getPosition(QString service);
     void seek(QString, qlonglong);
+
     void raisePlayer(QString destination);
+
     QString getArtUrl(QString service);
     QStringList getMetadata(QString service);
 }

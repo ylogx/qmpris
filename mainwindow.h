@@ -16,7 +16,7 @@ class MainWindow;
 class MainWindow : public QMainWindow, QDBusMessage
 {
     Q_OBJECT
-    
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
