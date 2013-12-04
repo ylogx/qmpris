@@ -58,7 +58,13 @@ QString MainWindow::currentPlayer(){
         return ("org.mpris.MediaPlayer2.audacious");
     }else if(ui->comboBox->currentText()=="Rhythmbox" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.rhythmbox"){
         return ("org.mpris.MediaPlayer2.rhythmbox");
+    }else if(ui->comboBox->currentText()=="JuK" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.juk"){
+        return ("org.mpris.MediaPlayer2.juk");
+    }else if(ui->comboBox->currentText()=="Vlc" || ui->comboBox->currentText()=="org.mpris.MediaPlayer2.vlc"){
+        return ("org.mpris.MediaPlayer2.vlc");
     }
+
+
 }
 
 void MainWindow::reconnect(){
@@ -76,7 +82,7 @@ void MainWindow::reconnect(){
     setMetadata(service);
     setPositionSlider(service);
     //connections
-    basicConnections();
+    basicConnections(); //play,pause,next,prev,showPlayer
     //specific connections
     if(service=="org.mpris.MediaPlayer2.amarok"){
         connect(ui->checkBoxMute, SIGNAL(stateChanged(int)),
@@ -133,7 +139,7 @@ void MainWindow::volumeChanged(int sliderVal){
         QMpris::setVolume("org.mpris.MediaPlayer2.audacious",sliderVal);
         break;
     case 10://"Clementine":
-        QMpris::setVolume("org.mpris.MediaPlayer2.audacious",sliderVal);
+        QMpris::setVolume("org.mpris.MediaPlayer2.clementine",sliderVal);
         break;
     default: break;
     }
@@ -141,7 +147,6 @@ void MainWindow::volumeChanged(int sliderVal){
 
 void MainWindow::positionChanged(int sliderVal){
     double sliderValDouble=sliderVal * 1000 * 10;  //multiple of 1000
-//    //qDebug()<<sliderVal<<"sliderval";
     //TODO make it work according to tracklength
     switch(ui->labelPlayer->text().length()){
     case 6://"Amarok":
@@ -151,7 +156,7 @@ void MainWindow::positionChanged(int sliderVal){
         QMpris::seek("org.mpris.MediaPlayer2.audacious",sliderValDouble);
         break;
     case 10://"Clementine":
-        QMpris::seek("org.mpris.MediaPlayer2.audacious",sliderValDouble);
+        QMpris::seek("org.mpris.MediaPlayer2.clementine",sliderValDouble);
         break;
     default: break;
     }
@@ -186,11 +191,7 @@ void MainWindow::prev(){
 }
 
 void MainWindow::showPlayer(){
-    QString service = currentPlayer();
-    QDBusMessage message= QDBusMessage::createMethodCall(service,
-                                                         "/org/mpris/MediaPlayer2",
-                                                         "org.mpris.MediaPlayer2","Raise");
-    QDBusConnection::sessionBus().send(message);
+    QMpris::raisePlayer(currentPlayer());
 }
 
 
@@ -287,5 +288,4 @@ void MainWindow::setMetadata(QString service){
     formatStr.append(":");
     formatStr.append(QString("%1").arg(seconds));
     ui->labelLength->setText(formatStr);
-    //qDebug()<<"hr:"<<hours<<"min: "<<minutes<<"sec"<<seconds<<"mil"<<milliseconds;
 }
