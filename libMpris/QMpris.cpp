@@ -12,12 +12,21 @@ void testDiscovered(){
     qDebug()<<"List is: "<<(list.toStringList().filter(rx));
 }
 QStringList discoveredMprisPlayer(){
+    QRegExp rx("org.mpris.MediaPlayer2.*");
     QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusInterface dbus_iface("org.freedesktop.DBus", "/org/freedesktop/DBus",
                               "org.freedesktop.DBus", bus);
-    QVariant list=dbus_iface.call("ListNames").arguments().at(0);
-    QRegExp rx("org.mpris.MediaPlayer2.*");
-    return(list.toStringList().filter(rx));
+    QStringList list=dbus_iface.call("ListNames").arguments().at(0).toStringList().filter(rx);
+
+    //XXX Remove vlc entries specific to processes
+    foreach(QString str, list){
+        qDebug()<<"Removing";
+        if(str.contains(QRegExp("org.mpris.MediaPlayer2.vlc-[0-9]*"))){
+            qDebug()<<"Found: "<<str;
+            list.removeOne(str);
+        }
+    }
+    return(list);
 }
 
 void playerOperation(QString destination, QString operation){
@@ -39,15 +48,15 @@ QString getIdentity(QString service){
 }
 
 long getTrackLength(QString service){
-        QDBusConnection bus=QDBusConnection::sessionBus();
-        QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
-        //get track length
-        QDBusReply<QVariant> metaVar = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Metadata");
-        QDBusArgument arg = metaVar.value().value<QDBusArgument>();
-        QVariantMap metaMap;
-        arg>>metaMap;
-        long int length = metaMap["mpris:length"].toInt();
-        return (length);
+    QDBusConnection bus=QDBusConnection::sessionBus();
+    QDBusInterface bus_interface(service,"/org/mpris/MediaPlayer2","org.freedesktop.DBus.Properties",bus);
+    //get track length
+    QDBusReply<QVariant> metaVar = bus_interface.call("Get","org.mpris.MediaPlayer2.Player","Metadata");
+    QDBusArgument arg = metaVar.value().value<QDBusArgument>();
+    QVariantMap metaMap;
+    arg>>metaMap;
+    long int length = metaMap["mpris:length"].toInt();
+    return (length);
 }
 
 double getPosition(QString service){
