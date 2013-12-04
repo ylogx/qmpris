@@ -38,10 +38,10 @@ namespace QMpris{
         bool CanPause() const;
         bool CanSeek() const;
         bool CanControl() const;
-    
+
     Q_SIGNALS:
         void Seeked( qlonglong Position ) const;
-    
+
     public slots:
         void Next() const;
         void Previous() const;
@@ -52,7 +52,7 @@ namespace QMpris{
         void Seek( qlonglong Offset ) const;
         void SetPosition( const QDBusObjectPath& TrackId, qlonglong Position ) const;
         void OpenUri( QString Uri ) const;
-    
+
     private slots:
         void trackPositionChanged( qint64 position, bool userSeek );
         void trackChanged();    // Meta::AlbumPtr album );
